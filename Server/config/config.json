@@ -3,8 +3,8 @@
     "username": "postgres",
     "password": "postgres",
     "database": "fash_print",
-    "host": "xxx.xxx.xxx.xxx",
-    "port":0,
+    "host": "204.188.247.54",
+    "port":990,
     "dialect": "postgres"
   },
   "test": {
