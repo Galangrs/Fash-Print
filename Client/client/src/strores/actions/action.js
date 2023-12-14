@@ -46,7 +46,8 @@ export const fetchProductData = (id) => {
                 },
             });
             if (!response.ok) {
-                throw { name: "Failed to fetch" };
+                const err = await response.json();
+                throw { name: err.ket };
             }
             const jsonResponse = await response.json();
             dispatch(getProductSuccess(jsonResponse));

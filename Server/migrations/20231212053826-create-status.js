@@ -10,7 +10,7 @@ module.exports = {
                 type: Sequelize.INTEGER,
             },
             nama_status: {
-                type: Sequelize.STRING,
+                type: Sequelize.BOOLEAN,
             },
             createdAt: {
                 allowNull: false,

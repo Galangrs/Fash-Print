@@ -15,7 +15,7 @@ const router = createBrowserRouter([
                 element: <HomePage />,
             },
             {
-                path: '/:id',
+                path: ':id',
                 element: <EditPage />,
             },
             {
@@ -23,11 +23,16 @@ const router = createBrowserRouter([
                 element: <AddProduct />,
             },
         ],
+    }, {
+        path: '*',
+        element: <App />,
+        children: [
+            {
+                path: '*',
+                element: <InvalidPage />,
+            },
+        ],
     },
-    {
-        path: ':id',
-        element: <InvalidPage />,
-    }
 ])
 
 export default router

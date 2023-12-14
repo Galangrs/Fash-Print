@@ -41,7 +41,7 @@ function transformData(originalData) {
         }
 
         transformedData.produk.push({
-            id_produk: item.id_produk,
+            id_produk: index + 1,
             nama_produk: item.nama_produk,
             kategori_id: transformedData.kategori[item.kategori],
             harga: item.harga,

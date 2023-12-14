@@ -4,11 +4,12 @@ import { useParams, useNavigate } from "react-router-dom"
 export default function InvalidPage() {
     const navigate = useNavigate();
     useEffect(() => {
-        navigate('/')
     })
     return (
         <div className="container">
-            <h1>404 PAGE</h1>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+                <h1>404 PAGE</h1>
+            </div>
         </div>
     );
 }

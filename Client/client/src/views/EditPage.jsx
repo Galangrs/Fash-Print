@@ -42,8 +42,11 @@ export default function EditPage() {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        dispatch(fetchUpdateProduct(id, localProductData));
-        navigate("/");
+        dispatch(fetchUpdateProduct(id, localProductData)).then(res => {
+            if (res) {
+                navigate("/")
+            }
+        });
     };
 
     return (

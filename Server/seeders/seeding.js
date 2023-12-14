@@ -7,13 +7,13 @@ module.exports = {
         await queryInterface.bulkInsert("Status", [
             {
                 id_status: 1,
-                nama_status: "bisa dijual",
+                nama_status: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },
             {
                 id_status: 2,
-                nama_status: "tidak bisa dijual",
+                nama_status: false,
                 createdAt: new Date(),
                 updatedAt: new Date(),
             },

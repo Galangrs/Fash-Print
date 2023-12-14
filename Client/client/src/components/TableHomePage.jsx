@@ -18,7 +18,12 @@ export default function TableHomePage({ product }) {
         },
         buttonsStyling: false
     });
+    function formatRupiah(amount) {
+        var formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        formattedAmount = `Rp ${formattedAmount}`;
 
+        return formattedAmount;
+    }
     const handleDeleteClick = () => {
         swalWithBootstrapButtons.fire({
             title: "Kamu yakin?",
@@ -52,7 +57,7 @@ export default function TableHomePage({ product }) {
                 <td className="text-center">{product.no}</td>
                 <td className="text-center">{product.nama_produk}</td>
                 <td className="text-center">{product.kategori}</td>
-                <td className="text-center">{product.harga}</td>
+                <td className="text-center">{formatRupiah(product.harga)}</td>
                 <td className="text-center d-flex justify-content-end">
                     <Button variant="outline-warning" style={{ marginRight: "5px" }}>
                         <Link to={"/" + product.id_produk}>EDIT</Link>

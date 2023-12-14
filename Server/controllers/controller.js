@@ -16,7 +16,7 @@ class Controller {
                         attributes: ["nama_status"],
                         as: "status",
                         where: {
-                            nama_status: "bisa dijual",
+                            nama_status: true,
                         },
                     },
                 ],
@@ -28,9 +28,9 @@ class Controller {
                 nama_produk: item.nama_produk,
                 kategori: item.kategori
                     ? item.kategori.nama_kategori
-                    : "item tidak memili kategori",
-                harga: item.harga,
-                status: item.status.nama_status,
+                    : "item tidak memilik kategori",
+                harga: String(item.harga),
+                status: "bisa dijual",
             }));
             res.status(200).json(data);
         } catch (error) {
@@ -67,17 +67,17 @@ class Controller {
             });
             if (!item)
                 throw { name: "notfound", message: "Produk tidak ditemukan" };
-            if (item.status.nama_status !== "bisa dijual")
+            if (!item.status.nama_status)
                 throw { name: "forbiden", message: "Produk tidak bisa dijual" };
             res.status(200).json({
                 id_produk: item.id_produk,
                 nama_produk: item.nama_produk,
                 kategori: item.kategori
                     ? item.kategori.nama_kategori
-                    : "item tidak memili kategori",
+                    : "item tidak memilik kategori",
                 kategori_id: item.kategori_id,
-                harga: item.harga,
-                status: item.status.nama_status,
+                harga: String(item.harga),
+                status: "bisa dijual",
             });
         } catch (error) {
             next(error);
@@ -86,6 +86,7 @@ class Controller {
 
     static async postProduct(req, res, next) {
         const { nama_produk, harga, kategori_id } = req.body;
+        let config;
         try {
             if (!nama_produk || !harga) {
                 throw {
@@ -103,13 +104,21 @@ class Controller {
                     name: "InvalidPostProduct",
                     message: "kategori_id hanya boleh angka",
                 };
+            } else if (kategori_id == "") {
+                config = {
+                    nama_produk,
+                    harga,
+                    status_id: 1,
+                };
+            } else {
+                config = {
+                    nama_produk,
+                    harga,
+                    kategori_id,
+                    status_id: 1,
+                };
             }
-            await Produk.create({
-                nama_produk,
-                harga,
-                kategori_id,
-                status_id: 1,
-            });
+            await Produk.create(config);
             res.status(200).json({
                 ket: `Produk ${nama_produk} Berhasil ditambahkan`,
             });
@@ -128,12 +137,21 @@ class Controller {
                     message: "ID tidak boleh kosong",
                 };
             }
-            if (!nama_produk || !harga) {
+            if (Number(harga) != harga) {
                 throw {
                     name: "InvalidPutProduct",
-                    message: "nama_produk dan harga tidak boleh kosong",
+                    message: "harga hanya boleh angka",
+                };
+            } else if (
+                Number(kategori_id) != kategori_id &&
+                kategori_id != null
+            ) {
+                throw {
+                    name: "InvalidPutProduct",
+                    message: "kategori_id hanya boleh angka",
                 };
             }
+
             const item = await Produk.findOne({
                 where: {
                     id_produk,

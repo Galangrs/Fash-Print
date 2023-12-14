@@ -15,7 +15,7 @@ module.exports = {
             },
             harga: {
                 allowNull: false,
-                type: Sequelize.STRING,
+                type: Sequelize.BIGINT,
             },
             kategori_id: {
                 type: Sequelize.INTEGER,
