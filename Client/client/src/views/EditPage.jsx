@@ -94,7 +94,7 @@ export default function EditPage() {
                     </div>
                     <br />
                     <button type="submit" className="btn btn-primary">
-                        Update
+                        Update Produk
                     </button>
                 </form>
             </div>

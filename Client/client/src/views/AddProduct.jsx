@@ -86,7 +86,7 @@ export default function AddProduct() {
                     </div>
                     <br />
                     <button type="submit" className="btn btn-primary">
-                        ADD PRODUCT
+                        Tambah Produk
                     </button>
                 </form>
             </div>
