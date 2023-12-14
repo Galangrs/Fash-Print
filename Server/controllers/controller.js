@@ -119,7 +119,7 @@ class Controller {
                 };
             }
             await Produk.create(config);
-            res.status(200).json({
+            res.status(201).json({
                 ket: `Produk ${nama_produk} Berhasil ditambahkan`,
             });
         } catch (error) {
@@ -172,7 +172,7 @@ class Controller {
                     },
                 }
             );
-            res.status(200).json({
+            res.status(201).json({
                 ket: `Produk ${nama_produk} Berhasil diupdate`,
             });
         } catch (error) {
@@ -200,7 +200,9 @@ class Controller {
                     id_produk,
                 },
             });
-            res.status(200).json({ ket: "Produk berhasil dihapus" });
+            res.status(200).json({
+                ket: `Produk ${data.nama_produk} berhasil dihapus`,
+            });
         } catch (error) {
             next(error);
         }
