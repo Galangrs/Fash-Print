@@ -12,8 +12,8 @@ function UserPassword() {
 
     // formatin username
     const formattedTime = Math.floor(nowGMT7.hours()) + nowGMT7.format(".mm");
-    const username = `tesprogrammer${tanggal}${bulan}${tahun}C${Math.floor(
-        formattedTime
+    const username = `tesprogrammer${tanggal}${bulan}${tahun}C${Math.ceil(
+        Number(formattedTime)
     )}`;
 
     // formatin password

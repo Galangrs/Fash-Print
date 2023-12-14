@@ -1,4 +1,4 @@
-const { sequelize, Produk, Kategori, Status } = require("../models");
+const { Produk, Kategori, Status } = require("../models");
 
 class Controller {
     static async getAvailableToSell(req, res, next) {
@@ -16,7 +16,7 @@ class Controller {
                         attributes: ["nama_status"],
                         as: "status",
                         where: {
-                            nama_status: "bisa dijual",
+                            nama_status: true,
                         },
                     },
                 ],
@@ -28,34 +28,99 @@ class Controller {
                 nama_produk: item.nama_produk,
                 kategori: item.kategori
                     ? item.kategori.nama_kategori
-                    : "item tidak memili kategori",
-                harga: item.harga,
-                status: item.status,
+                    : "item tidak memilik kategori",
+                harga: String(item.harga),
+                status: "bisa dijual",
             }));
-            console.log(data);
-            res.status(200).json({ data });
+            res.status(200).json(data);
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getProductDetail(req, res, next) {
+        const { id_produk } = req.params;
+        try {
+            const item = await Produk.findOne({
+                attributes: [
+                    "id_produk",
+                    "nama_produk",
+                    "harga",
+                    "kategori_id",
+                ],
+                include: [
+                    {
+                        model: Kategori,
+                        attributes: ["nama_kategori"],
+                        as: "kategori",
+                    },
+                    {
+                        model: Status,
+                        attributes: ["nama_status"],
+                        as: "status",
+                    },
+                ],
+                order: [["id_produk", "ASC"]],
+                where: {
+                    id_produk,
+                },
+            });
+            if (!item)
+                throw { name: "notfound", message: "Produk tidak ditemukan" };
+            if (!item.status.nama_status)
+                throw { name: "forbiden", message: "Produk tidak bisa dijual" };
+            res.status(200).json({
+                id_produk: item.id_produk,
+                nama_produk: item.nama_produk,
+                kategori: item.kategori
+                    ? item.kategori.nama_kategori
+                    : "item tidak memilik kategori",
+                kategori_id: item.kategori_id,
+                harga: String(item.harga),
+                status: "bisa dijual",
+            });
         } catch (error) {
             next(error);
         }
     }
 
     static async postProduct(req, res, next) {
-        const { nama: nama_produk, harga, kategori_id } = req.body;
+        const { nama_produk, harga, kategori_id } = req.body;
+        let config;
         try {
             if (!nama_produk || !harga) {
                 throw {
                     name: "InvalidPostProduct",
-                    message: "Nama dan harga tidak boleh kosong",
+                    message: "nama_produk dan harga tidak boleh kosong",
                 };
             }
-            await Produk.create({
-                nama_produk,
-                harga,
-                kategori_id,
-                id_status: 1,
-            });
+            if (Number(harga) != harga) {
+                throw {
+                    name: "InvalidPostProduct",
+                    message: "harga hanya boleh angka",
+                };
+            } else if (Number(kategori_id) != kategori_id) {
+                throw {
+                    name: "InvalidPostProduct",
+                    message: "kategori_id hanya boleh angka",
+                };
+            } else if (kategori_id == "") {
+                config = {
+                    nama_produk,
+                    harga,
+                    status_id: 1,
+                };
+            } else {
+                config = {
+                    nama_produk,
+                    harga,
+                    kategori_id,
+                    status_id: 1,
+                };
+            }
+            await Produk.create(config);
             res.status(200).json({
-                ket: `Product ${nama_produk} Berhasil ditambahkan`,
+                ket: `Produk ${nama_produk} Berhasil ditambahkan`,
             });
         } catch (error) {
             next(error);
@@ -64,7 +129,7 @@ class Controller {
 
     static async putProduct(req, res, next) {
         const { id_produk } = req.params;
-        const { nama: nama_produk, harga, kategori_id, status_id } = req.body;
+        const { nama_produk, harga, kategori_id, status_id } = req.body;
         try {
             if (!id_produk) {
                 throw {
@@ -72,12 +137,28 @@ class Controller {
                     message: "ID tidak boleh kosong",
                 };
             }
-            if (!nama_produk || !harga) {
+            if (Number(harga) != harga) {
                 throw {
                     name: "InvalidPutProduct",
-                    message: "Nama dan harga tidak boleh kosong",
+                    message: "harga hanya boleh angka",
+                };
+            } else if (
+                Number(kategori_id) != kategori_id &&
+                kategori_id != null
+            ) {
+                throw {
+                    name: "InvalidPutProduct",
+                    message: "kategori_id hanya boleh angka",
                 };
             }
+
+            const item = await Produk.findOne({
+                where: {
+                    id_produk,
+                },
+            });
+            if (!item)
+                throw { name: "notfound", message: "Produk tidak ditemukan" };
             await Produk.update(
                 {
                     nama_produk,
@@ -92,7 +173,7 @@ class Controller {
                 }
             );
             res.status(200).json({
-                ket: `Product ${nama_produk} Berhasil diupdate`,
+                ket: `Produk ${nama_produk} Berhasil diupdate`,
             });
         } catch (error) {
             next(error);
@@ -113,13 +194,28 @@ class Controller {
                 },
             });
             if (!data)
-                throw { name: "forbiden", message: "Product tidak ditemukan" };
+                throw { name: "notfound", message: "Produk tidak ditemukan" };
             await Produk.destroy({
                 where: {
                     id_produk,
                 },
             });
-            res.status(200).json({ ket: "Product berhasil dihapus" });
+            res.status(200).json({ ket: "Produk berhasil dihapus" });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    static async getCategories(req, res, next) {
+        try {
+            const data = await Kategori.findAll();
+            const response = data.map((el) => {
+                return {
+                    id_kategori: el.id_kategori,
+                    nama_kategori: el.nama_kategori,
+                };
+            });
+            res.status(200).json(response);
         } catch (error) {
             next(error);
         }
